@@ -13,7 +13,7 @@ st.set_page_config(
     page_title="Facility GeoPackage Map",
     layout="wide"
 )
-st.title("🌍 Facility GeoPackage Map")
+st.title("Facility GeoPackage Map")
 
 # =========================================================
 # CONSTANT
@@ -32,7 +32,7 @@ except Exception as e:
     st.error(f"GPKG file not found or unreadable: {e}")
     st.stop()
 
-layer = st.sidebar.selectbox("🗂️ Layer", layers)
+layer = st.sidebar.selectbox("Layer", layers)
 
 # =========================================================
 # LOAD DATA
@@ -68,10 +68,10 @@ col1, col2 = st.columns([1, 2])
 # LEFT PANEL — FILTER BERTAHAP
 # =========================================================
 with col1:
-    st.subheader("🔍 Filter Facilities")
+    st.subheader("Filter Facilities")
 
     countries = sorted(gdf[COUNTRY_COL].dropna().unique())
-    country = st.selectbox("🌎 Country", countries)
+    country = st.selectbox("Country", countries)
 
     gdf_country = gdf[gdf[COUNTRY_COL] == country].copy()
 
@@ -83,7 +83,7 @@ with col1:
     gdf_country["__label__"] = gdf_country.apply(facility_label, axis=1)
 
     selected_label = st.selectbox(
-        "🏭 Facility",
+        "Facility",
         gdf_country["__label__"].tolist()
     )
 
@@ -91,7 +91,7 @@ with col1:
         gdf_country["__label__"] == selected_label
     ].iloc[0]
 
-    with st.expander("📄 Facility Attributes"):
+    with st.expander("Facility Attributes"):
         st.dataframe(
             selected_row.drop(
                 labels=["geometry", "__label__"],
