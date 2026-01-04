@@ -2,9 +2,11 @@
 
 import streamlit as st
 import geopandas as gpd
+import pandas as pd
 import fiona
 import folium
 from streamlit_folium import st_folium
+from data_loader import load_facility_data
 
 # =========================================================
 # CONFIG
@@ -23,42 +25,19 @@ COUNTRY_COL = "country"
 NAME_COL = "facility_name"
 ID_COL = "facility_id"
 
-# =========================================================
-# LOAD GPKG
-# =========================================================
-try:
-    layers = fiona.listlayers(GPKG_FILE)
-except Exception as e:
-    st.error(f"GPKG file not found or unreadable: {e}")
-    st.stop()
-
-layer = st.sidebar.selectbox("Layer", layers)
+EXCLUDE_ATTR_COLS = [
+    "GID_0", "GID_1", "GID_2", "GID_3", "GID_4", "source_id", "comment", "production_start", "production_end", "activity_status", "activity_status_year", "surface_area_sq_km", "concession_area_sq_km", "sub_site_other_names", "sub_site_name", "facility_other_names"
+]
 
 # =========================================================
-# LOAD DATA
+# LOAD DATA (SINGLE DEFAULT LAYER)
 # =========================================================
-gdf = gpd.read_file(GPKG_FILE, layer=layer)
+gdf, _ = load_facility_data()
 
 if gdf.empty:
     st.warning("Layer is empty")
     st.stop()
-
-# =========================================================
-# CRS FIX
-# =========================================================
-if gdf.crs and gdf.crs.to_epsg() != 4326:
-    gdf = gdf.to_crs(epsg=4326)
-
-# =========================================================
-# CLEAN GEOMETRY
-# =========================================================
-gdf = gdf[gdf.geometry.notnull()]
-gdf = gdf[~gdf.geometry.is_empty]
-
-if gdf.empty:
-    st.warning("No valid geometry")
-    st.stop()
-
+    
 # =========================================================
 # LAYOUT
 # =========================================================
@@ -92,11 +71,15 @@ with col1:
     ].iloc[0]
 
     with st.expander("Facility Attributes"):
+        hidden_cols = ["geometry", "__label__"] + EXCLUDE_ATTR_COLS
+
+        display_row = (
+            selected_row
+            .drop(labels=hidden_cols, errors="ignore")
+        )
+
         st.dataframe(
-            selected_row.drop(
-                labels=["geometry", "__label__"],
-                errors="ignore"
-            ).to_frame("value")
+            display_row.to_frame("value")
         )
 
 # =========================================================
