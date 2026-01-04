@@ -147,7 +147,7 @@ bar_chart = (
             "commodity_product:N",
             title="Commodity Product",
             sort="-y",
-            axis=alt.Axis(labelAngle=-45, labelLimit=200)
+            axis=alt.Axis(labelAngle=-45, labelLimit=130, labelOverlap=False)
         ),
         y=alt.Y(
             "facility_count:Q",
@@ -211,7 +211,7 @@ base = (
         x=alt.X(
             "year:O",
             title="Year",
-            axis=alt.Axis(labelAngle=-45)
+            axis=alt.Axis(labelAngle=-45, labelOverlap=False)
         ),
         y=alt.Y(
             "value_tonnes:Q",
