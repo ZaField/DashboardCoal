@@ -2,8 +2,10 @@ import geopandas as gpd
 import pandas as pd
 import fiona
 
-GPKG_FILE = "facilities.gpkg"
-OWNERSHIP_FILE = "ownership.csv"
+DATASET_DIR = "dataset"
+
+GPKG_FILE = f"{DATASET_DIR}/facilities.gpkg"
+OWNERSHIP_FILE = f"{DATASET_DIR}/ownership.csv"
 
 def load_facility_data(layer=None):
     layers = fiona.listlayers(GPKG_FILE)

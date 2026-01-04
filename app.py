@@ -3,7 +3,9 @@
 import streamlit as st
 import geopandas as gpd
 import pandas as pd
+import altair as alt
 import fiona
+import re
 import folium
 from streamlit_folium import st_folium
 from data_loader import load_facility_data
@@ -20,10 +22,11 @@ st.title("Facility GeoPackage Map")
 # =========================================================
 # CONSTANT
 # =========================================================
-GPKG_FILE = "facilities.gpkg"
+GPKG_FILE = "dataset/facilities.gpkg"
 COUNTRY_COL = "country"
 NAME_COL = "facility_name"
 ID_COL = "facility_id"
+OWNER_COL = "owners"
 
 EXCLUDE_ATTR_COLS = [
     "GID_0", "GID_1", "GID_2", "GID_3", "GID_4", "source_id", "comment", "production_start", "production_end", "activity_status", "activity_status_year", "surface_area_sq_km", "concession_area_sq_km", "sub_site_other_names", "sub_site_name", "facility_other_names"
@@ -37,7 +40,7 @@ gdf, _ = load_facility_data()
 if gdf.empty:
     st.warning("Layer is empty")
     st.stop()
-    
+
 # =========================================================
 # LAYOUT
 # =========================================================
@@ -81,6 +84,80 @@ with col1:
         st.dataframe(
             display_row.to_frame("value")
         )
+
+# =========================================================
+# OWNER DISTRIBUTION (PIE CHART)
+# =========================================================
+def parse_owners(owner_str):
+    """
+    'BHP (50%), Vale (50%)'
+    → [('BHP', 0.5), ('Vale', 0.5)]
+    """
+    if pd.isna(owner_str):
+        return []
+
+    owners = []
+    for part in owner_str.split(","):
+        m = re.search(r"(.*)\(([\d\.]+)%\)", part.strip())
+        if m:
+            name = m.group(1).strip()
+            pct = float(m.group(2)) / 100
+            owners.append((name, pct))
+
+    return owners
+
+rows = []
+
+for _, r in gdf_country.iterrows():
+    for owner, share in parse_owners(r[OWNER_COL]):
+        rows.append({
+            "owner": owner,
+            "share": share
+        })
+
+owner_df = pd.DataFrame(rows)
+
+TOP_N = 20
+
+owner_agg = (
+    owner_df
+    .groupby("owner", as_index=False)
+    .agg(total_share=("share", "sum"))
+    .sort_values("total_share", ascending=False)
+)
+
+top = owner_agg.head(TOP_N)
+others = owner_agg.iloc[TOP_N:]["total_share"].sum()
+
+if others > 0:
+    top = pd.concat([
+        top,
+        pd.DataFrame([{
+            "owner": "Others",
+            "total_share": others
+        }])
+    ])
+
+st.subheader("Facility Ownership Distribution")
+
+pie = (
+    alt.Chart(top)
+    .mark_arc(innerRadius=50)
+    .encode(
+        theta=alt.Theta("total_share:Q", title="Ownership Share"),
+        color=alt.Color("owner:N", legend=alt.Legend(title="Owner")),
+        tooltip=[
+            alt.Tooltip("owner:N"),
+            alt.Tooltip("total_share:Q", format=".2f")
+        ]
+    )
+)
+
+st.altair_chart(pie)
+
+
+
+
 
 # =========================================================
 # RIGHT PANEL — MAP
