@@ -13,7 +13,7 @@ st.title("Coal Pricing")
 # LOAD DATA
 # =========================================================
 
-DATA_FILE = "dataset/Coal_01_02_26-01_03_22.csv"
+DATA_FILE = "dataset/CoalPricing.csv"
 
 df = pd.read_csv(DATA_FILE)
 
@@ -77,7 +77,7 @@ line_chart = (
         ),
         y=alt.Y(
             "avg_close:Q",
-            title="Average Close Price"
+            title="Monthly Average Price/$USD"
         ),
         tooltip=[
             alt.Tooltip("month_name:N", title="Month"),
@@ -85,18 +85,9 @@ line_chart = (
         ]
     )
     .properties(
-        title=f"Average Monthly Coal Price — {year}"
+        title=f"Average Monthly Coal Price of year : {year}"
     )
 )
 
 st.altair_chart(line_chart, use_container_width=True)
 
-# =========================================================
-# OPTIONAL: SHOW DATA
-# =========================================================
-
-with st.expander("Show aggregated data"):
-    st.dataframe(
-        monthly_avg,
-        use_container_width=True
-    )
