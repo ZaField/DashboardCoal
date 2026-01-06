@@ -14,10 +14,10 @@ from data_loader import load_facility_data
 # CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Facility GeoPackage Map",
+    page_title="Facility",
     layout="wide"
 )
-st.title("Facility GeoPackage Map")
+st.title("Facility Map")
 
 # =========================================================
 # CONSTANT
