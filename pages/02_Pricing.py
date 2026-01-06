@@ -73,7 +73,8 @@ line_chart = (
             sort=[
                 "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-            ]
+            ],
+            axis=alt.Axis(labelAngle=-45)
         ),
         y=alt.Y(
             "avg_close:Q",
