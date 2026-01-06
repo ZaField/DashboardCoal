@@ -242,7 +242,7 @@ with chart_col2:
     if not scatter_source.empty:
         st.altair_chart(scatter_chart, use_container_width=True)
 
-st.dataframe(
-    filtered,
-    use_container_width=True
-)
+# st.dataframe(
+#     filtered,
+#     use_container_width=True
+# )
