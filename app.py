@@ -291,15 +291,12 @@ filtered = df[df["year"] == year]
 
 line_chart = (
     alt.Chart(filtered)
-    .mark_line()
+    .mark_line(point=True)
     .encode(
         x=alt.X(
-            "month_name:N", 
-            title="Month", 
-            sort=[ 
-                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" 
-            ]
+            "Date:T",
+            title="Month",
+            axis=alt.Axis(format="%b")  # tampilkan label bulan saja
         ),
         y=alt.Y(
             "Close:Q",
@@ -311,9 +308,8 @@ line_chart = (
         ]
     )
     .properties(
-        title=f"Coal Price of year : {year}"
+        title=f"Coal Price Trend of year : {year}"
     )
 )
 
 st.altair_chart(line_chart, use_container_width=True)
-
