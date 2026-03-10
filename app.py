@@ -273,6 +273,8 @@ df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 df = df.dropna(subset=["Date", "Close"])
 
 df["year"] = df["Date"].dt.year
+df["month"] = df["Date"].dt.month
+df["month_name"] = df["Date"].dt.strftime("%b")
 
 # =========================================================
 # YEAR FILTER
