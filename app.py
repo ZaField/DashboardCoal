@@ -292,17 +292,18 @@ line_chart = (
     .mark_line()
     .encode(
         x=alt.X(
-            "Date:T",
-            title="Date"
+            "month_name:N", 
+            title="Month", 
+            sort=[ "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ]
         ),
         y=alt.Y(
             "Close:Q",
             title="Coal Price / $USD"
         ),
-        tooltip=[
-            alt.Tooltip("Date:T", title="Date"),
-            alt.Tooltip("Close:Q", title="Price", format=".2f")
-        ]
+        tooltip=[ 
+            alt.Tooltip("month_name:N", title="Month"), 
+            alt.Tooltip("avg_close:Q", title="Avg Price", format=".2f") ]
     )
     .properties(
         title=f"Coal Price of year : {year}"
