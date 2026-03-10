@@ -250,7 +250,6 @@ with chart_col2:
 # =========================================================
 # LOAD DATA
 # =========================================================
-
 DATA_FILE = "dataset/CoalPricing.csv"
 
 df = pd.read_csv(DATA_FILE)
@@ -267,15 +266,13 @@ if missing:
     st.stop()
 
 # =========================================================
-# DATE PARSING (CRITICAL)
+# DATE PARSING
 # =========================================================
 
 df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 df = df.dropna(subset=["Date", "Close"])
 
 df["year"] = df["Date"].dt.year
-df["month"] = df["Date"].dt.month
-df["month_name"] = df["Date"].dt.strftime("%b")
 
 # =========================================================
 # YEAR FILTER
@@ -287,43 +284,28 @@ year = st.selectbox("Year", years)
 filtered = df[df["year"] == year]
 
 # =========================================================
-# AGGREGATION — AVERAGE PRICE PER MONTH
-# =========================================================
-
-monthly_avg = (
-    filtered
-    .groupby(["year", "month", "month_name"], as_index=False)
-    .agg(avg_close=("Close", "mean"))
-    .sort_values("month")
-)
-
-# =========================================================
-# LINE CHART
+# LINE CHART (DAILY DATA - NO MONTHLY AVERAGE)
 # =========================================================
 
 line_chart = (
-    alt.Chart(monthly_avg)
-    .mark_line(point=True)
+    alt.Chart(filtered)
+    .mark_line()
     .encode(
         x=alt.X(
-            "month_name:N",
-            title="Month",
-            sort=[
-                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-            ]
+            "Date:T",
+            title="Date"
         ),
         y=alt.Y(
-            "avg_close:Q",
-            title="Monthly Average Price/$USD"
+            "Close:Q",
+            title="Coal Price / $USD"
         ),
         tooltip=[
-            alt.Tooltip("month_name:N", title="Month"),
-            alt.Tooltip("avg_close:Q", title="Avg Price", format=".2f")
+            alt.Tooltip("Date:T", title="Date"),
+            alt.Tooltip("Close:Q", title="Price", format=".2f")
         ]
     )
     .properties(
-        title=f"Average Monthly Coal Price of year : {year}"
+        title=f"Coal Price of year : {year}"
     )
 )
 
